@@ -6,6 +6,7 @@ import {
   bitacorasRouter,
 } from './modules/bitacoras/bitacoras.routes.js';
 import { authRouter } from './modules/auth/auth.routes.js';
+import { notificacionesRouter } from './modules/notificaciones/notificaciones.routes.js';
 import { organizacionesRouter } from './modules/organizaciones/organizaciones.routes.js';
 import {
   planAsignacionRouter,
@@ -26,4 +27,5 @@ apiV1.use('/asignaciones/:id/bitacoras', bitacorasAsignacionRouter);
 apiV1.use('/asignaciones', asignacionesRouter);
 apiV1.use('/planes-trabajo', planesTrabajoRouter);
 apiV1.use('/bitacoras', bitacorasRouter);
+apiV1.use('/notificaciones', notificacionesRouter);
 apiV1.use('/auditoria', auditoriaRouter);
