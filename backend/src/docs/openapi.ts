@@ -8,7 +8,10 @@ import '../modules/auth/auth.docs.js';
 import '../modules/organizaciones/organizaciones.docs.js';
 import '../modules/plazas/plazas.docs.js';
 import '../modules/asignaciones/asignaciones.docs.js';
+import '../modules/postulaciones/postulaciones.docs.js';
 import '../modules/planes-trabajo/planes-trabajo.docs.js';
+import '../modules/bitacoras/bitacoras.docs.js';
+import '../modules/notificaciones/notificaciones.docs.js';
 import '../modules/auditoria/auditoria.docs.js';
 
 const DESCRIPCION = `
@@ -35,8 +38,11 @@ export const generarDocumentoOpenApi = () => {
         description: 'Organizaciones receptoras y sus tutores empresariales',
       },
       { name: 'Plazas', description: 'Bolsa de plazas de prácticas y su aprobación académica' },
+      { name: 'Postulaciones', description: 'Postulación a plazas y preselección de candidatos' },
       { name: 'Asignaciones', description: 'Asignación de estudiantes y expediente de prácticas' },
       { name: 'Plan de trabajo', description: 'Elaboración, versiones y aprobación del plan' },
+      { name: 'Bitácoras', description: 'Registro quincenal de actividades y horas' },
+      { name: 'Notificaciones', description: 'Avisos dentro de la aplicación' },
       { name: 'API pública', description: 'Consulta abierta para sistemas externos (RF-26)' },
       { name: 'Auditoría', description: 'Bitácora inmutable de operaciones críticas' },
     ],

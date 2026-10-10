@@ -20,9 +20,7 @@ for (const rol of Object.keys(destinations) as Rol[]) {
       await page.getByRole('navigation', { name: 'Navegación principal' }).locator(`[href="${path}"]`).click();
       await expect(page).toHaveURL(new RegExp(`${path}$`));
       await expect(page.locator('#titulo-pagina')).toBeFocused();
-      if (!['/inicio', '/org/inicio', '/perfil'].includes(path)) {
-        await expect(page.getByText('Esta sección aún no está disponible', { exact: true })).toBeVisible();
-      }
+      await expect(page.getByText('Esta sección aún no está disponible', { exact: true })).toHaveCount(0);
       if (response) {
         const usuario = (await (await response).json()).usuario;
         expect(usuario.correo).toBe(cuentas[rol]);
