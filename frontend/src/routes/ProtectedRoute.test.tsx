@@ -1,3 +1,4 @@
+import { routeCatalog } from './catalog';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, expect, it, vi } from 'vitest';
@@ -22,6 +23,7 @@ function PrivatePage() {
   return <p>Contenido privado de prueba</p>;
 }
 const pages: PageRegistry = {
+  ...(Object.fromEntries(routeCatalog.map((route) => [route.page, async () => ({ default: PrivatePage })])) as unknown as PageRegistry),
   login: async () => ({ default: () => <h1>Login de prueba</h1> }),
   registro: async () => ({ default: () => <h1>Registro de prueba</h1> }),
   inicio: async () => ({ default: PrivatePage }), perfil: async () => ({ default: PrivatePage }),
@@ -119,7 +121,7 @@ it('shows a safe recovery page for a rejected lazy chunk', async () => {
   };
   window.addEventListener('error', expectedChunkError);
   try {
-    setup('/plazas', async () => json(makeSesionResponse()), { ...pages, modulo: async () => { throw new Error('secret stack'); } });
+    setup('/plazas', async () => json(makeSesionResponse()), { ...pages, plazas: async () => { throw new Error('secret stack'); } });
     expect(await screen.findByRole('heading', { name: /no pudimos cargar/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /inicio/i })).toHaveAttribute('href', '/inicio');
     expect(screen.queryByText(/secret stack/)).not.toBeInTheDocument();

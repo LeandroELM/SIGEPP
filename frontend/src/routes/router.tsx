@@ -11,10 +11,9 @@ import { AuthLayout } from '../layouts/AuthLayout';
 export type PageRegistry = Record<PageKey, () => Promise<{ default: ComponentType }>>;
 
 export function createAppRouter(pages: PageRegistry): ReturnType<typeof createBrowserRouter> {
-  const components = {
-    login: lazy(pages.login), registro: lazy(pages.registro), inicio: lazy(pages.inicio),
-    perfil: lazy(pages.perfil), modulo: lazy(pages.modulo),
-  };
+  const components = Object.fromEntries(
+    Object.entries(pages).map(([key, load]) => [key, lazy(load)]),
+  ) as Record<PageKey, ReturnType<typeof lazy>>;
   const routes: RouteObject[] = routeCatalog.map((route) => {
     const base = { id: route.id, path: route.path, caseSensitive: true, handle: route };
     if (route.id === 'root') return { ...base, element: <SessionDestination root /> };
