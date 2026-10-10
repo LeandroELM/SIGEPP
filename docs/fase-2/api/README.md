@@ -49,7 +49,7 @@ npx newman run docs/fase-2/api/SIGEPP.postman_collection.json \
 El API limita a 100 peticiones por minuto por IP (RNF-08) y la colección hace 86: entre dos ejecuciones completas hay que esperar un minuto.
 La asignación se crea con fecha de inicio 20 días antes del día de la ejecución, para que existan quincenas abiertas en las que registrar bitácoras.
 
-**Resultado de referencia (10/10/2026):** 86 peticiones, 213 aserciones, 0 fallos, tiempo de respuesta promedio de 45 ms. El reporte está en `docs/fase-2/evidencias/reporte-postman.html`.
+**Resultado de referencia (10/10/2026):** 86 peticiones, 213 aserciones, 0 fallos, tiempo de respuesta promedio de 38 ms. El reporte está en `docs/fase-2/evidencias/reporte-postman.html`.
 
 ## Regenerar la especificación OpenAPI
 

@@ -116,7 +116,11 @@ publicación y corrección de plazas; tutores de la organización; bandeja de pl
 confirmación de asignaciones; expediente con línea de tiempo, plan de trabajo con versiones y bitácoras quincenales;
 revisiones de tutores; auditoría; panel de inicio por rol y campana de notificaciones.
 
-Consulta el [guion de demo](docs/fase-2/s1-frontend-demo.md) y la [evidencia y limitaciones](docs/fase-2/s1-frontend-verificacion.md).
+Documentación de la Fase 2: [manual de usuario](docs/fase-2/manual/manual-usuario.md) por rol,
+[guía de la demo](docs/fase-2/guia-demo.md) del proceso completo y
+[evidencias de integración](docs/fase-2/evidencias/evidencias-integracion.md) Frontend ↔ Backend ↔ BD.
+
+Consulta también el [guion de demo de S1](docs/fase-2/s1-frontend-demo.md) y la [evidencia y limitaciones](docs/fase-2/s1-frontend-verificacion.md).
 
 ### Scripts del backend
 
