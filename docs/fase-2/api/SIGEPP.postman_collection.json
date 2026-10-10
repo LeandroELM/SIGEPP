@@ -1683,7 +1683,723 @@
       ]
     },
     {
-      "name": "5. Asignaciones (RF-13, RF-24)",
+      "name": "5. Postulaciones (RF-11, RF-12)",
+      "description": "El estudiante se postula (RN-01, RN-02, RN-03) y el tutor empresarial preselecciona o rechaza a los candidatos de su organización.",
+      "item": [
+        {
+          "name": "Iniciar sesión — Estudiante con 74 % de avance",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.environment.set('tokenEstudianteSinAvance', pm.response.json().accessToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correoEstudianteSinAvance}}\",\n  \"contrasena\": \"{{contrasena}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RN-01: no cumple el avance mínimo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 422', () => pm.response.to.have.status(422));",
+                  "pm.test('Cita la regla RN-01', () => pm.expect(pm.response.json().error.detalles[0]).to.include('RN-01'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudianteSinAvance}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/postulaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "postulaciones"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plazaId\": \"{{plazaNuevaId}}\",\n  \"cartaMotivacion\": \"Me interesa aplicar lo aprendido en la carrera y aportar al equipo de desarrollo de la organización.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Iniciar sesión — Segundo estudiante",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.environment.set('tokenEstudiante2', pm.response.json().accessToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correoEstudiante2}}\",\n  \"contrasena\": \"{{contrasena}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Postularse a la plaza aprobada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "const postulacion = pm.response.json().postulacion;",
+                  "pm.test('Queda POSTULADA', () => pm.expect(postulacion.estado).to.eql('POSTULADA'));",
+                  "pm.environment.set('postulacionNuevaId', postulacion.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/postulaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "postulaciones"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plazaId\": \"{{plazaNuevaId}}\",\n  \"cartaMotivacion\": \"Me interesa aplicar lo aprendido en la carrera y aportar al equipo de desarrollo de la organización.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "No se postula dos veces a la misma plaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/postulaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "postulaciones"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plazaId\": \"{{plazaNuevaId}}\",\n  \"cartaMotivacion\": \"Me interesa aplicar lo aprendido en la carrera y aportar al equipo de desarrollo de la organización.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Carta de motivación demasiado corta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/postulaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "postulaciones"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plazaId\": \"{{plazaNuevaId}}\",\n  \"cartaMotivacion\": \"Me interesa.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar la plaza de QA",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.environment.set('plazaQaId', pm.response.json().data[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/plazas?q=Calidad",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "plazas"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Calidad"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Postularse a una segunda plaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('postulacionRetiroId', pm.response.json().postulacion.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/postulaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "postulaciones"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plazaId\": \"{{plazaQaId}}\",\n  \"cartaMotivacion\": \"Me interesa aplicar lo aprendido en la carrera y aportar al equipo de desarrollo de la organización.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Retirar la segunda postulación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda RETIRADA', () => pm.expect(pm.response.json().postulacion.estado).to.eql('RETIRADA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/postulaciones/{{postulacionRetiroId}}/retirar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "postulaciones",
+                "{{postulacionRetiroId}}",
+                "retirar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "No se retira dos veces",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/postulaciones/{{postulacionRetiroId}}/retirar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "postulaciones",
+                "{{postulacionRetiroId}}",
+                "retirar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mis postulaciones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Lista paginada con las dos postulaciones', () => pm.expect(pm.response.json().meta.total).to.eql(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/postulaciones/mias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "postulaciones",
+                "mias"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Candidatos de mi organización",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const candidatos = pm.response.json().data;",
+                  "pm.test('Incluye la nueva postulación', () => pm.expect(candidatos.map((c) => c.id)).to.include(pm.environment.get('postulacionNuevaId')));",
+                  "const rechazo = candidatos.find((c) => c.id !== pm.environment.get('postulacionNuevaId'));",
+                  "pm.test('Hay otro candidato del seed para rechazar', () => pm.expect(rechazo).to.exist);",
+                  "pm.environment.set('postulacionRechazoId', rechazo.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenTutor}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/postulaciones/candidatos?estado=POSTULADA",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "postulaciones",
+                "candidatos"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "POSTULADA"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Estudiante no puede ver candidatos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/postulaciones/candidatos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "postulaciones",
+                "candidatos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Preseleccionar candidato",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda PRESELECCIONADA', () => pm.expect(pm.response.json().postulacion.estado).to.eql('PRESELECCIONADA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenTutor}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/postulaciones/{{postulacionNuevaId}}/preseleccionar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "postulaciones",
+                "{{postulacionNuevaId}}",
+                "preseleccionar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Rechazar candidato con comentario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda RECHAZADA', () => pm.expect(pm.response.json().postulacion.estado).to.eql('RECHAZADA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenTutor}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/postulaciones/{{postulacionRechazoId}}/rechazar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "postulaciones",
+                "{{postulacionRechazoId}}",
+                "rechazar"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comentario\": \"Buscamos experiencia previa en pruebas automatizadas.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Asignaciones (RF-13, RF-24)",
       "description": "La coordinación confirma la asignación de una postulación preseleccionada (RN-02, RN-05, RN-06).",
       "item": [
         {
@@ -1776,6 +2492,17 @@
           "name": "Confirmar asignación y designar tutor académico",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// La práctica inicia hace 20 días para que existan quincenas en las que registrar bitácoras.",
+                  "const inicio = new Date(Date.now() - 20 * 24 * 60 * 60 * 1000);",
+                  "pm.environment.set('fechaInicioPractica', inicio.toISOString().slice(0, 10));"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
@@ -1809,7 +2536,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"postulacionId\": \"{{postulacionId}}\",\n  \"docenteId\": \"{{docenteId}}\",\n  \"tutorEmpresarialId\": \"{{tutorEmpresarialId}}\",\n  \"fechaInicio\": \"2026-10-19\",\n  \"fechaFin\": \"2026-12-11\"\n}",
+              "raw": "{\n  \"postulacionId\": \"{{postulacionId}}\",\n  \"docenteId\": \"{{docenteId}}\",\n  \"tutorEmpresarialId\": \"{{tutorEmpresarialId}}\",\n  \"fechaInicio\": \"{{fechaInicioPractica}}\",\n  \"fechaFin\": \"2026-12-11\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2003,7 +2730,7 @@
       ]
     },
     {
-      "name": "6. Plan de trabajo (RF-14, RF-15, RN-07)",
+      "name": "7. Plan de trabajo (RF-14, RF-15, RN-07)",
       "description": "Elaboración del plan, observación de un tutor, nueva versión y aprobación de ambos tutores.",
       "item": [
         {
@@ -2524,9 +3251,790 @@
       ]
     },
     {
-      "name": "7. Auditoría (RNF-13)",
+      "name": "8. Bitácoras (RF-16, RF-17, RF-18)",
+      "description": "Registro quincenal con el plan aprobado (RN-07), revisión de los tutores, horas acumuladas y calendario con atrasos (RN-08).",
+      "item": [
+        {
+          "name": "Calendario de quincenas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const cuerpo = pm.response.json();",
+                  "pm.test('Devuelve el calendario y el resumen', () => { pm.expect(cuerpo.quincenas).to.be.an('array').that.is.not.empty; pm.expect(cuerpo.resumen.horasMinimas).to.eql(240); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/asignaciones/{{asignacionId}}/bitacoras",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "asignaciones",
+                "{{asignacionId}}",
+                "bitacoras"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar bitácora de la quincena 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "const bitacora = pm.response.json().bitacora;",
+                  "pm.test('Queda en BORRADOR', () => pm.expect(bitacora.estado).to.eql('BORRADOR'));",
+                  "pm.environment.set('bitacoraId', bitacora.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/asignaciones/{{asignacionId}}/bitacoras",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "asignaciones",
+                "{{asignacionId}}",
+                "bitacoras"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quincena\": 1,\n  \"actividades\": \"Levantamiento de requisitos del módulo de inventario y modelado de la base de datos.\",\n  \"horas\": 40\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Horas fuera de rango",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/asignaciones/{{asignacionId}}/bitacoras",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "asignaciones",
+                "{{asignacionId}}",
+                "bitacoras"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quincena\": 2,\n  \"actividades\": \"Implementación del formulario de registro de productos.\",\n  \"horas\": 120\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La quincena no se registra dos veces",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/asignaciones/{{asignacionId}}/bitacoras",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "asignaciones",
+                "{{asignacionId}}",
+                "bitacoras"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quincena\": 1,\n  \"actividades\": \"Levantamiento de requisitos del módulo de inventario.\",\n  \"horas\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enviar a revisión",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda ENVIADA', () => pm.expect(pm.response.json().bitacora.estado).to.eql('ENVIADA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bitacoras/{{bitacoraId}}/enviar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "bitacoras",
+                "{{bitacoraId}}",
+                "enviar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Tutor académico deja observaciones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda OBSERVADA', () => pm.expect(pm.response.json().bitacora.estado).to.eql('OBSERVADA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenDocente}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bitacoras/{{bitacoraId}}/observar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "bitacoras",
+                "{{bitacoraId}}",
+                "observar"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"observacion\": \"Detalla las tablas modeladas y los acuerdos de la reunión.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Corregir la bitácora",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bitacoras/{{bitacoraId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "bitacoras",
+                "{{bitacoraId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"actividades\": \"Levantamiento de requisitos y modelado de las tablas productos, bodegas y movimientos; acuerdos de la reunión de seguimiento.\",\n  \"horas\": 42\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reenviar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bitacoras/{{bitacoraId}}/enviar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "bitacoras",
+                "{{bitacoraId}}",
+                "enviar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Estudiante no puede aprobar su bitácora",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bitacoras/{{bitacoraId}}/aprobar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "bitacoras",
+                "{{bitacoraId}}",
+                "aprobar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Aprobación del tutor empresarial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda APROBADA', () => pm.expect(pm.response.json().bitacora.estado).to.eql('APROBADA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenTutor}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bitacoras/{{bitacoraId}}/aprobar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "bitacoras",
+                "{{bitacoraId}}",
+                "aprobar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Las horas se acumulan en el expediente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Horas acumuladas: 42', () => pm.expect(pm.response.json().asignacion.horasAcumuladas).to.eql(42));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/asignaciones/actual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "asignaciones",
+                "actual"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "9. Notificaciones (RF-23)",
+      "description": "Avisos dentro de la aplicación generados por los cambios de estado anteriores; cada usuario solo accede a los suyos.",
+      "item": [
+        {
+          "name": "Mis notificaciones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const cuerpo = pm.response.json();",
+                  "pm.test('Tiene notificaciones sin leer', () => pm.expect(cuerpo.noLeidas).to.be.above(0));",
+                  "pm.test('Avisa la aprobación de la bitácora', () => pm.expect(cuerpo.data.map((n) => n.tipo)).to.include('BITACORA_APROBADA'));",
+                  "pm.environment.set('notificacionId', cuerpo.data[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notificaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notificaciones"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Marcar una como leída",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda leída', () => pm.expect(pm.response.json().notificacion.leida).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notificaciones/{{notificacionId}}/leer",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notificaciones",
+                "{{notificacionId}}",
+                "leer"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro usuario no puede marcarla",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenTutor}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notificaciones/{{notificacionId}}/leer",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notificaciones",
+                "{{notificacionId}}",
+                "leer"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Marcar todas como leídas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notificaciones/leer-todas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notificaciones",
+                "leer-todas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ya no quedan sin leer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Cero sin leer', () => pm.expect(pm.response.json().noLeidas).to.eql(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenEstudiante}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notificaciones?soloNoLeidas=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notificaciones"
+              ],
+              "query": [
+                {
+                  "key": "soloNoLeidas",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "10. Auditoría (RNF-13)",
       "description": "Bitácora de operaciones críticas, solo para administración.",
       "item": [
+        {
+          "name": "Consultar auditoría de bitácoras",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Registra envío, observación y aprobación', () => pm.expect(pm.response.json().data.map((r) => r.accion)).to.include.members(['ENVIAR_REVISION', 'OBSERVAR', 'APROBAR']));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auditoria?entidad=Bitacora",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auditoria"
+              ],
+              "query": [
+                {
+                  "key": "entidad",
+                  "value": "Bitacora"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
         {
           "name": "Consultar auditoría del plan de trabajo",
           "event": [
