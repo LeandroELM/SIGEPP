@@ -19,13 +19,15 @@ export function PostularSeccion({ plaza }: { plaza: Plaza }) {
   const postular = useApiMutation<{ postulacion: Postulacion }, string>((cartaMotivacion) => ({
     path: '/postulaciones', method: 'POST', json: { plazaId: plaza.id, cartaMotivacion },
   }));
-  const existente = mias.data?.data.find((p) => p.plaza.id === plaza.id && p.estado !== 'RETIRADA');
+  // The API keeps one application per student and plaza, even after withdrawing it.
+  const existente = mias.data?.data.find((p) => p.plaza.id === plaza.id);
   const largo = carta.trim().length;
 
   return <Seccion title="Postulación">
     {existente
       ? <div className="grid gap-3">
         <p>Te postulaste a esta plaza el {fecha(existente.creadaEn)}. Estado: <EstadoBadge estado={existente.estado} /></p>
+        {existente.estado === 'RETIRADA' && <p>Retiraste esta postulación; no es posible volver a postularse a la misma plaza.</p>}
         <div><EnlaceBoton to="/postulaciones">Ver mis postulaciones</EnlaceBoton></div>
       </div>
       : plaza.cuposDisponibles === 0
