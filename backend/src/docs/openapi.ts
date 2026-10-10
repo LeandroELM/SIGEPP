@@ -10,6 +10,7 @@ import '../modules/plazas/plazas.docs.js';
 import '../modules/asignaciones/asignaciones.docs.js';
 import '../modules/postulaciones/postulaciones.docs.js';
 import '../modules/planes-trabajo/planes-trabajo.docs.js';
+import '../modules/bitacoras/bitacoras.docs.js';
 import '../modules/auditoria/auditoria.docs.js';
 
 const DESCRIPCION = `
@@ -39,6 +40,7 @@ export const generarDocumentoOpenApi = () => {
       { name: 'Postulaciones', description: 'Postulación a plazas y preselección de candidatos' },
       { name: 'Asignaciones', description: 'Asignación de estudiantes y expediente de prácticas' },
       { name: 'Plan de trabajo', description: 'Elaboración, versiones y aprobación del plan' },
+      { name: 'Bitácoras', description: 'Registro quincenal de actividades y horas' },
       { name: 'API pública', description: 'Consulta abierta para sistemas externos (RF-26)' },
       { name: 'Auditoría', description: 'Bitácora inmutable de operaciones críticas' },
     ],

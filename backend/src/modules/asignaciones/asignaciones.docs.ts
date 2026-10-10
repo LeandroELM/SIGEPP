@@ -75,6 +75,10 @@ const asignacionSchema = registro.register(
       })
       .nullable(),
     totalBitacoras: z.number().int(),
+    bitacorasPorRevisar: z
+      .number()
+      .int()
+      .openapi({ description: 'Bitácoras enviadas pendientes de revisión' }),
     progreso: z.object({
       horasAcumuladas: z.number().int(),
       horasMinimas: z.number().int(),
