@@ -93,7 +93,10 @@ it('login ofrece restauración explícita y no renueva de nuevo al mostrar su fo
 });
 
 it.each([['/candidatos', '/candidatos', 'query'], ['/candidatos', '/candidatos', 'state'], ['https://evil.example', '/inicio', 'query']] as const)('router real tras login valida retorno %s en %s (%s)', async (returnTo, expected, source) => {
-  const runtime = createRuntime({ env, storage: sessionStorage, fetchImpl: async (url) => String(url).endsWith('/auth/login') ? json(makeSesionResponse('TUTOR_EMPRESARIAL')) : failure() });
+  // Without a refresh cookie the session starts anonymous; after login, private screens
+  // read empty lists so the destination renders without logging the user out.
+  const empty = { data: [], meta: { total: 0, pagina: 1, limite: 10, totalPaginas: 1 }, noLeidas: 0 };
+  const runtime = createRuntime({ env, storage: sessionStorage, fetchImpl: async (url) => String(url).endsWith('/auth/login') ? json(makeSesionResponse('TUTOR_EMPRESARIAL')) : String(url).includes('/auth/') ? failure() : json(empty) });
   await runtime.session.initialize();
   window.history.replaceState(null, '', source === 'query' ? '/login?returnTo=' + encodeURIComponent(returnTo) : '/login');
   const router = createAppRouter(pages);
