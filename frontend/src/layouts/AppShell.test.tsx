@@ -1,3 +1,4 @@
+import { routeCatalog } from '../routes/catalog';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, expect, it } from 'vitest';
@@ -17,7 +18,10 @@ const menus: [Rol, string, string[]][] = [
   ['COORDINADOR', '/panel', ['/panel', '/plazas', '/organizaciones', '/asignaciones', '/perfil']],
   ['ADMIN', '/inicio', ['/inicio', '/plazas', '/organizaciones', '/asignaciones', '/admin/auditoria', '/perfil']],
 ];
+// Every module page renders the placeholder; the shell is what this file tests.
+const modulo = async () => ({ default: () => <p>Esta sección aún no está disponible</p> });
 const pages: PageRegistry = {
+  ...(Object.fromEntries(routeCatalog.map((route) => [route.page, modulo])) as unknown as PageRegistry),
   login: async () => ({ default: () => <h1>Login de prueba</h1> }),
   registro: async () => ({ default: () => <h1>Registro de prueba</h1> }),
   inicio: async () => ({ default: () => <p>Bienvenida real</p> }),
