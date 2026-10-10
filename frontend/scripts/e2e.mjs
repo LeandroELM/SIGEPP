@@ -30,7 +30,9 @@ let runError;
 const started = Date.now();
 
 // Deliberate allowlist: private inherited environment cannot leak into Vite/Playwright.
-const operationalKeys = ['PATH', 'Path', 'SYSTEMROOT', 'SystemRoot', 'WINDIR', 'COMSPEC', 'TEMP', 'TMP', 'HOME', 'USERPROFILE', 'LOCALAPPDATA', 'APPDATA', 'PATHEXT', 'CI', 'PLAYWRIGHT_BROWSERS_PATH'];
+const operationalKeys = ['PATH', 'Path', 'SYSTEMROOT', 'SystemRoot', 'WINDIR', 'COMSPEC', 'TEMP', 'TMP', 'HOME', 'USERPROFILE', 'LOCALAPPDATA', 'APPDATA', 'PATHEXT', 'CI', 'PLAYWRIGHT_BROWSERS_PATH',
+  // Docker Desktop on Windows locates its compose plugin through these.
+  'ProgramData', 'ProgramFiles'];
 const operationalEnv = Object.fromEntries(operationalKeys.filter(key => process.env[key] !== undefined).map(key => [key, process.env[key]]));
 const publicEnv = { ...operationalEnv, VITE_API_URL: 'http://localhost:4000/api/v1', VITE_DOMINIOS_INSTITUCIONALES: 'uni.edu.ni,std.uni.edu.ni',
   E2E_RUN_ID: runId, E2E_MODE: mode, E2E_ZOOM: zoom ? '1' : '0', PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1', PLAYWRIGHT_NO_COPY_PROMPT: '1' };

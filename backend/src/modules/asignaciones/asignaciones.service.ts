@@ -57,6 +57,8 @@ const asignacionSelect = {
     },
   },
   _count: { select: { bitacoras: true, evaluaciones: true } },
+  // Bitácoras enviadas que esperan la revisión de un tutor (RF-17).
+  bitacoras: { where: { estado: 'ENVIADA', eliminadaEn: null }, select: { id: true } },
 } satisfies Prisma.AsignacionSelect;
 
 type AsignacionDb = Prisma.AsignacionGetPayload<{ select: typeof asignacionSelect }>;
@@ -101,10 +103,11 @@ const calcularHitos = (a: AsignacionDb) => {
 };
 
 const serializar = (a: AsignacionDb, parte?: ParteAsignacion) => {
-  const { _count, ...resto } = a;
+  const { _count, bitacoras, ...resto } = a;
   return {
     ...resto,
     totalBitacoras: _count.bitacoras,
+    bitacorasPorRevisar: bitacoras.length,
     progreso: {
       horasAcumuladas: a.horasAcumuladas,
       horasMinimas: a.periodo.horasMinimas,
