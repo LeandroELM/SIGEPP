@@ -49,7 +49,7 @@ npm run dev
 
 El API queda en `http://localhost:4000`. Verificación: `GET http://localhost:4000/api/health`.
 
-## Puesta en marcha del frontend S1
+## Puesta en marcha del frontend
 
 Con el backend iniciado, abre otra terminal:
 
@@ -111,6 +111,11 @@ y control100/formularios200 2/2 aprobados. Shell200 tiene evidencia anterior sep
 La suite principal usa API `NODE_ENV=test` (sin límite IP); `rate-limit` crea otro API `development` para comprobar el intento 21.
 La ronda production prueba el build de la SPA con Vite preview, no un despliegue HTTPS ni cookies `Secure` de un API de producción.
 
+Pantallas por rol (S2 y S3): bolsa de plazas con filtros y postulación; mis postulaciones; candidatos del tutor empresarial;
+publicación y corrección de plazas; tutores de la organización; bandeja de plazas y organizaciones del coordinador;
+confirmación de asignaciones; expediente con línea de tiempo, plan de trabajo con versiones y bitácoras quincenales;
+revisiones de tutores; auditoría; panel de inicio por rol y campana de notificaciones.
+
 Consulta el [guion de demo](docs/fase-2/s1-frontend-demo.md) y la [evidencia y limitaciones](docs/fase-2/s1-frontend-verificacion.md).
 
 ### Scripts del backend
@@ -170,6 +175,11 @@ La especificación se genera a partir de los mismos esquemas Zod que validan cad
 | PUT | `/api/v1/plazas/{id}` | Corregir una plaza en revisión o rechazada | Organización |
 | PATCH | `/api/v1/plazas/{id}/aprobar` · `/rechazar` | Revisión académica de la plaza | Coord., Admin. |
 | GET | `/api/v1/publico/plazas` | Plazas vigentes para sistemas externos | Público |
+| POST | `/api/v1/postulaciones` | Postularse a una plaza (valida RN-01, RN-02 y RN-03) | Estudiante |
+| GET | `/api/v1/postulaciones/mias` | Mis postulaciones | Estudiante |
+| PATCH | `/api/v1/postulaciones/{id}/retirar` | Retirar una postulación pendiente | Estudiante |
+| GET | `/api/v1/postulaciones/candidatos` | Candidatos de las plazas de mi organización | Tutor emp. |
+| PATCH | `/api/v1/postulaciones/{id}/preseleccionar` · `/rechazar` | Resolver un candidato | Tutor emp. |
 | GET | `/api/v1/asignaciones/candidatos` | Postulaciones preseleccionadas por asignar | Coord. |
 | GET | `/api/v1/asignaciones/docentes` | Docentes con su carga de tutorados | Coord. |
 | POST | `/api/v1/asignaciones` | Confirmar asignación y designar tutor académico | Coord. |
@@ -180,6 +190,12 @@ La especificación se genera a partir de los mismos esquemas Zod que validan cad
 | PUT | `/api/v1/planes-trabajo/{id}` | Editar el plan en borrador u observado | Estudiante |
 | POST | `/api/v1/planes-trabajo/{id}/enviar` | Enviar a revisión (guarda una versión) | Estudiante |
 | PATCH | `/api/v1/planes-trabajo/{id}/aprobar` · `/observar` | Revisión de cada tutor | Tutores |
+| GET · POST | `/api/v1/asignaciones/{id}/bitacoras` | Calendario de quincenas (RN-08) o registrar bitácora (RN-07) | Partes · Estudiante |
+| PUT | `/api/v1/bitacoras/{id}` | Corregir una bitácora en borrador u observada | Estudiante |
+| POST | `/api/v1/bitacoras/{id}/enviar` | Enviar a revisión (marca extemporánea tras 3 días de gracia) | Estudiante |
+| PATCH | `/api/v1/bitacoras/{id}/aprobar` · `/observar` | Revisión; al aprobar se acumulan las horas | Tutores |
+| GET | `/api/v1/notificaciones` | Mis notificaciones con el total sin leer | Autenticado |
+| PATCH | `/api/v1/notificaciones/{id}/leer` · `/leer-todas` | Marcar como leídas | Autenticado |
 | GET | `/api/v1/auditoria` | Bitácora de auditoría con filtros | Admin. |
 
 Errores con formato uniforme:
