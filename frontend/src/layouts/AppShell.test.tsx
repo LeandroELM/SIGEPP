@@ -66,7 +66,9 @@ it('closes Más on navigation and focuses the new heading with a usable skip lin
   await userEvent.click(within(screen.getByRole('dialog')).getByRole('link', { name: 'Perfil' }));
   await waitFor(() => expect(router.state.location.pathname).toBe('/perfil'));
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-  expect(await screen.findByRole('heading', { name: 'Perfil', level: 1 })).toHaveFocus();
+  // The shell moves focus in the next animation frame, after the dialog returns its own focus.
+  const heading = await screen.findByRole('heading', { name: 'Perfil', level: 1 });
+  await waitFor(() => expect(heading).toHaveFocus());
 });
 it('canonical logout clears identity/cache immediately and preserves remote failure for public UI', async () => {
   const pending = deferred<Response>();
