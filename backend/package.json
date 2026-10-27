@@ -21,6 +21,7 @@
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset",
     "db:studio": "prisma studio",
+    "db:crear-admin": "tsx scripts/crear-admin.ts",
     "docs:openapi": "tsx scripts/exportar-openapi.ts",
     "docs:diagramas": "tsx scripts/generar-diagramas.ts"
   },

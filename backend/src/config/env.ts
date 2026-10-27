@@ -20,6 +20,8 @@ const esquemaEnv = z.object({
         .filter(Boolean),
     ),
   BCRYPT_COST: z.coerce.number().int().min(12).default(12),
+  // Proxies delante del API en producción (Render = 1; Vercel reenviando a Render = 2).
+  TRUST_PROXY: z.coerce.number().int().min(0).default(1),
 });
 
 const resultado = esquemaEnv.safeParse(process.env);
