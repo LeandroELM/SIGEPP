@@ -100,7 +100,7 @@ test('movimiento reducido respeta preferencia real del navegador', async ({ page
 test('variantes visuales de Button y Badge', async ({ page }) => {
   await gotoWithEvidence(page, '/e2e/components.html', `.e2e/${process.env.E2E_RUN_ID}/styles-initial-goto.json`);
   const section = page.getByRole('region', { name: 'Variantes visuales' });
-  const navy = 'rgb(31, 56, 100)', white = 'rgb(255, 255, 255)', red = 'rgb(192, 0, 0)';
+  const navy = 'rgb(30, 79, 214)', white = 'rgb(255, 255, 255)', red = 'rgb(200, 30, 58)';
   const buttons = [
     { variant: 'primario', background: navy, color: white },
     { variant: 'secundario', background: white, color: navy, border: navy },
@@ -116,10 +116,10 @@ test('variantes visuales de Button y Badge', async ({ page }) => {
     await button.focus(); await expect(button).toBeFocused();
   }
   const badges = [
-    { label: 'éxito', background: 'rgb(0, 176, 80)', color: 'rgb(32, 32, 32)' },
-    { label: 'advertencia', background: 'rgb(237, 125, 49)', color: 'rgb(32, 32, 32)' },
+    { label: 'éxito', background: 'rgb(61, 214, 140)', color: 'rgb(11, 27, 58)' },
+    { label: 'advertencia', background: 'rgb(245, 165, 36)', color: 'rgb(11, 27, 58)' },
     { label: 'error', background: red, color: white },
-    { label: 'información', background: 'rgb(46, 84, 150)', color: white },
+    { label: 'información', background: 'rgb(26, 95, 196)', color: white },
   ];
   for (const variant of badges) {
     const badge = section.getByText(`Variante Badge ${variant.label}`, { exact: true }).locator('..');

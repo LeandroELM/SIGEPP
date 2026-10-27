@@ -4,7 +4,10 @@ export default {
   content: ['./index.html', './src/**/*.{ts,tsx}', './e2e/**/*.{html,ts,tsx}'],
   theme: {
     screens: { sm: '640px', lg: '1025px' },
-    fontFamily: { sans: ['Inter', 'Arial', 'sans-serif'] },
+    fontFamily: {
+      sans: ['Geist Sans', 'Arial', 'sans-serif'],
+      mono: ['Geist Mono', 'ui-monospace', 'monospace'],
+    },
     fontSize: {
       xs: ['var(--font-size-xs)', { lineHeight: '1.5' }],
       sm: ['var(--font-size-sm)', { lineHeight: '1.5' }],
@@ -31,6 +34,9 @@ export default {
     },
     extend: {
       colors: {
+        ink: 'var(--color-ink)',
+        sky: 'var(--color-sky)',
+        tint: 'var(--color-tint)',
         primary: 'var(--color-primary)',
         secondary: 'var(--color-secondary)',
         info: 'var(--color-info)',

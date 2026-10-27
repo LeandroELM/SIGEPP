@@ -26,7 +26,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         const { Icon, border } = tones[notice.tone];
         return <Toast.Root key={notice.key} open type={notice.tone === 'error' ? 'foreground' : 'background'} duration={notice.tone === 'error' ? 10000 : 5000}
           onOpenChange={(open) => { if (!open) setNotices((current) => current.filter((item) => item.key !== notice.key)); }}
-          className={`flex min-w-0 items-start gap-3 rounded-card border border-border border-l-[4px] bg-surface p-4 text-text shadow-lg ${border}`}>
+          className={`flex min-w-0 items-start gap-3 border border-ink border-l-[4px] bg-surface p-4 text-text shadow-[6px_6px_0_rgb(30_79_214_/_20%)] ${border}`}>
           <Icon className="ui-icon" aria-hidden="true" />
           <div className="min-w-0 flex-1">
             <Toast.Title className="font-semibold">{notice.title}</Toast.Title>

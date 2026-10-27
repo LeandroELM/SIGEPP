@@ -12,9 +12,10 @@ export default function InicioPage() {
   if (snapshot.status !== 'autenticada') return null;
   const { usuario } = snapshot;
   return <div className="grid gap-6">
-    <section className="rounded-card border border-border bg-surface p-4 sm:p-6">
-      <h2 className="break-words text-xl font-semibold">Bienvenido, {usuario.nombres} {usuario.apellidos}</h2>
-      <p className="mt-2 break-words text-muted">{usuario.correo}</p>
+    <section className="ui-grid-bg--dark relative overflow-hidden p-6 text-surface sm:p-8">
+      <h2 className="break-words text-2xl font-light">Bienvenido, {usuario.nombres} {usuario.apellidos}</h2>
+      <p className="ui-mono mt-2 break-words text-white/75">{usuario.correo}</p>
+      <span aria-hidden="true" className="pointer-events-none absolute -right-[4rem] -top-[4rem] h-[12rem] w-[12rem] bg-[image:var(--gradient-text)] opacity-50 blur-3xl" />
     </section>
     <ResumenRol rol={usuario.rol} />
     <AvisosRecientes />
