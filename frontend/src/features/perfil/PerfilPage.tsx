@@ -5,9 +5,9 @@ import { usePerfil } from './usePerfil';
 
 type Detail = readonly [string, string | number | null | undefined];
 function Details({ title, values }: { title: string; values: readonly Detail[] }) {
-  return <section className="rounded-card border border-border bg-surface p-4 sm:p-6">
-    <h2 className="mb-4 text-xl font-semibold">{title}</h2>
-    <dl className="grid gap-4 sm:grid-cols-2">{values.map(([label, value]) => <div key={label} className="min-w-0"><dt className="text-sm text-muted">{label}</dt><dd className="mt-1 break-words">{value === null || value === undefined || value === '' ? 'No disponible' : value}</dd></div>)}</dl>
+  return <section className="ui-panel p-4 sm:p-6">
+    <h2 className="mb-4 text-xl font-medium text-ink">{title}</h2>
+    <dl className="grid gap-4 sm:grid-cols-2">{values.map(([label, value]) => <div key={label} className="min-w-0"><dt className="ui-mono text-xs text-muted">{label}</dt><dd className="mt-1 break-words">{value === null || value === undefined || value === '' ? 'No disponible' : value}</dd></div>)}</dl>
   </section>;
 }
 export default function PerfilPage() {
