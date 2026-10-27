@@ -87,6 +87,63 @@ export const loginSchema = z
   })
   .openapi('Login');
 
+/**
+ * Datos del perfil que la propia persona puede corregir. El correo, el carnet, el rol y
+ * el avance académico no se editan aquí: identifican la cuenta o los valida coordinación.
+ */
+export const actualizarPerfilSchema = z
+  .object({
+    nombres: datosPersonales.nombres.optional(),
+    apellidos: datosPersonales.apellidos.optional(),
+    telefono: z
+      .string()
+      .trim()
+      .regex(/^\+?[\d\s-]{8,15}$/, 'Teléfono no válido')
+      .nullable()
+      .optional()
+      .openapi({ example: '+505 8888 0000' }),
+    carrera: z
+      .string()
+      .trim()
+      .min(3)
+      .max(100)
+      .optional()
+      .openapi({ example: 'Ingeniería en Sistemas' }),
+    anio: z.coerce.number().int().min(1).max(5).optional().openapi({ example: 5 }),
+    departamento: z
+      .string()
+      .trim()
+      .min(3)
+      .max(100)
+      .optional()
+      .openapi({ example: 'Ingeniería en Sistemas' }),
+    especialidad: z
+      .string()
+      .trim()
+      .max(100)
+      .nullable()
+      .optional()
+      .openapi({ example: 'Bases de Datos' }),
+    cargo: z.string().trim().min(2).max(100).optional().openapi({ example: 'Líder técnico' }),
+  })
+  .strict()
+  .refine((datos) => Object.keys(datos).length > 0, 'Indica al menos un campo para actualizar')
+  .openapi('ActualizarPerfil');
+
+export const cambiarContrasenaSchema = z
+  .object({
+    contrasenaActual: z
+      .string({ required_error: 'La contraseña actual es obligatoria' })
+      .min(1, 'La contraseña actual es obligatoria')
+      .max(72),
+    contrasenaNueva: contrasena,
+  })
+  .refine((datos) => datos.contrasenaActual !== datos.contrasenaNueva, {
+    path: ['contrasenaNueva'],
+    message: 'La nueva contraseña debe ser distinta de la actual',
+  })
+  .openapi('CambiarContrasena');
+
 export const rolSchema = z.enum([
   'ESTUDIANTE',
   'TUTOR_ACADEMICO',
@@ -135,3 +192,5 @@ export const usuarioPublicoSchema = z
 
 export type RegistroInput = z.infer<typeof registroSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+export type ActualizarPerfilInput = z.infer<typeof actualizarPerfilSchema>;
+export type CambiarContrasenaInput = z.infer<typeof cambiarContrasenaSchema>;

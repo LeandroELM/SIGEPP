@@ -33,6 +33,9 @@ export const ESTADOS: Record<string, EstadoInfo> = {
   ATRASADA: { label: 'Atrasada', tone: 'error' },
   FUTURA: { label: 'Próxima', tone: 'informacion' },
   EXTEMPORANEA: { label: 'Extemporánea', tone: 'advertencia' },
+  // Cuentas de usuario
+  ACTIVO: { label: 'Activo', tone: 'exito' },
+  INACTIVO: { label: 'Inactivo', tone: 'advertencia' },
   // Tutores empresariales
   ACTIVO_TUTOR: { label: 'Activo', tone: 'exito' },
   INACTIVO_TUTOR: { label: 'De baja', tone: 'advertencia' },

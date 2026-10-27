@@ -43,3 +43,13 @@ export const yo = async (req: Request, res: Response) => {
   const usuario = await authService.obtenerPerfil(req.usuario!.id);
   res.json({ usuario });
 };
+
+export const actualizarPerfil = async (req: Request, res: Response) => {
+  const usuario = await authService.actualizarPerfil(req.usuario!.id, req.body);
+  res.json({ usuario });
+};
+
+export const cambiarContrasena = async (req: Request, res: Response) => {
+  await authService.cambiarContrasena(req.usuario!.id, req.body, req.cookies?.[COOKIE_REFRESH]);
+  res.status(204).end();
+};

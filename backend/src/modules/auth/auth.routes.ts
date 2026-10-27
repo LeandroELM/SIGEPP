@@ -4,7 +4,12 @@ import { requireAuth } from '../../middleware/auth.js';
 import { limiteAutenticacion } from '../../middleware/rate-limit.js';
 import { validate } from '../../middleware/validate.js';
 import * as controller from './auth.controller.js';
-import { loginSchema, registroSchema } from './auth.schema.js';
+import {
+  actualizarPerfilSchema,
+  cambiarContrasenaSchema,
+  loginSchema,
+  registroSchema,
+} from './auth.schema.js';
 
 export const authRouter = Router();
 
@@ -23,3 +28,17 @@ authRouter.post(
 authRouter.post('/refresh', asyncHandler(controller.refresh));
 authRouter.post('/logout', asyncHandler(controller.logout));
 authRouter.get('/yo', requireAuth, asyncHandler(controller.yo));
+authRouter.patch(
+  '/yo',
+  requireAuth,
+  validate({ body: actualizarPerfilSchema }),
+  asyncHandler(controller.actualizarPerfil),
+);
+// Lleva el límite de autenticación porque verifica la contraseña actual.
+authRouter.put(
+  '/yo/contrasena',
+  requireAuth,
+  limiteAutenticacion,
+  validate({ body: cambiarContrasenaSchema }),
+  asyncHandler(controller.cambiarContrasena),
+);
