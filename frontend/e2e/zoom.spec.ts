@@ -100,14 +100,14 @@ test('Chrome separado: formularios con zoom nativo 200% y captura DIP', async ()
   await nativeZoom('forms200', 2, async (page, stage, measure, capture) => {
     await stage('login-navigation-start'); await page.goto('/login');
     await expect(page.getByRole('heading', { name: 'Iniciar sesión' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Iniciar sesión', exact: true })).toHaveCSS('background-color', 'rgb(31, 56, 100)');
+    await expect(page.getByRole('button', { name: 'Iniciar sesión', exact: true })).toHaveCSS('background-color', 'rgb(30, 79, 214)');
     await expect(page.getByRole('button', { name: 'Iniciar sesión', exact: true })).toHaveCSS('color', 'rgb(255, 255, 255)');
     await measure('login200'); await capture('zoom200-login-fixed.png');
     await page.getByLabel('Correo', { exact: true }).focus(); await page.keyboard.press('Tab');
     await expect(page.getByLabel('Contraseña', { exact: true })).toBeFocused();
     await stage('registration-navigation-start'); await page.goto('/registro');
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Crear cuenta', exact: true })).toHaveCSS('background-color', 'rgb(31, 56, 100)');
+    await expect(page.getByRole('button', { name: 'Crear cuenta', exact: true })).toHaveCSS('background-color', 'rgb(30, 79, 214)');
     await expect(page.getByRole('button', { name: 'Crear cuenta', exact: true })).toHaveCSS('color', 'rgb(255, 255, 255)');
     await measure('registro200'); await capture('zoom200-registro-fixed.png');
     const select = page.getByRole('combobox', { name: 'Rol' });

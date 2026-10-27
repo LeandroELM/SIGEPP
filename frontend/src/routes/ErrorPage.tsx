@@ -15,7 +15,7 @@ export function ErrorPage({ code }: { code: 403 | 404 | 'load' }) {
     load: 'Hubo un problema al abrir la página. Puedes volver al inicio o intentar recargarla.',
   };
   return <main className="mx-auto flex min-h-screen max-w-[48rem] flex-col items-start justify-center gap-4 p-6">
-    <h1 className="text-2xl font-bold">{titles[code]}</h1>
+    <h1 className="text-2xl font-light text-ink">{titles[code]}</h1>
     <p>{descriptions[code]}</p>
     <Link className="inline-flex items-center text-primary underline" to={home}>{authenticated ? 'Volver al inicio' : 'Iniciar sesión'}</Link>
     {code === 'load' && <Button variant="secundario" onClick={() => window.location.reload()}>Recargar página</Button>}

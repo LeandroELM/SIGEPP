@@ -49,14 +49,14 @@ export function Tabla<T>({ caption, rows, columns, getRowId, sort, onSortChange,
 
   return <div className="min-w-0">
     <div className="hidden sm:block">
-      <table className="w-full table-fixed border-collapse bg-surface">
+      <table className="w-full table-fixed border-collapse border border-border bg-surface">
         {desktop && <>
           <caption className="p-3 text-left text-lg font-semibold">{caption}</caption>
-          <thead><tr>{columns.map((column) => <th key={column.id} scope="col" className="border-b border-border p-3 text-left"
+          <thead className="bg-tint"><tr>{columns.map((column) => <th key={column.id} scope="col" className="ui-mono border-b border-ink p-3 text-left text-xs font-normal text-muted"
             aria-sort={column.sortable ? (sort?.columnId === column.id ? (sort.direction === 'asc' ? 'ascending' : 'descending') : 'none') : undefined}>
             {column.sortable && onSortChange ? sortButton(column) : column.header}
           </th>)}</tr></thead>
-          <tbody>{rows.map((row) => <tr key={getRowId(row)}>{columns.map((column) => <td key={column.id} className="border-b border-border p-3 align-top">{column.render(row)}</td>)}</tr>)}</tbody>
+          <tbody>{rows.map((row) => <tr key={getRowId(row)} className="hover:bg-background">{columns.map((column) => <td key={column.id} className="border-b border-border p-3 align-top">{column.render(row)}</td>)}</tr>)}</tbody>
         </>}
       </table>
     </div>

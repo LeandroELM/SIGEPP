@@ -8,7 +8,7 @@ test('login interactivo registra únicamente JS inicial solicitado', async ({ pa
   });
   await page.goto('/login');
   const submit = page.getByRole('button', { name: 'Iniciar sesión', exact: true });
-  await expect(submit).toHaveCSS('background-color', 'rgb(31, 56, 100)');
+  await expect(submit).toHaveCSS('background-color', 'rgb(30, 79, 214)');
   await expect(submit).toHaveCSS('color', 'rgb(255, 255, 255)');
   await page.getByLabel('Correo', { exact: true }).fill('medicion@uni.edu.ni');
   await submit.click();
