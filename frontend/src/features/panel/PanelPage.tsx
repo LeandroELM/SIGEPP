@@ -4,9 +4,9 @@ import { useSession } from '../../hooks/useSession';
 import type { Asignacion, Candidato, Organizacion, Plaza } from '../shared/types';
 
 function Indicador({ titulo, valor, to, accion }: { titulo: string; valor: number | undefined; to: string; accion: string }) {
-  return <li className="grid gap-2 rounded-card border border-border bg-surface p-4 sm:p-6">
+  return <li className="ui-panel grid gap-2 p-4 sm:p-6">
     <p className="text-muted">{titulo}</p>
-    <p className="text-2xl font-bold">{valor ?? '…'}</p>
+    <p className="text-[3rem] font-light leading-none tabular-nums text-ink">{valor ?? '…'}</p>
     <Link className="text-primary underline" to={to}>{accion}</Link>
   </li>;
 }

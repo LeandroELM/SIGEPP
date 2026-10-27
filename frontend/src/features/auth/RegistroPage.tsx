@@ -63,7 +63,7 @@ export default function RegistroPage() {
     reset(next === 'ESTUDIANTE' ? { ...common, rol: next, carnet: '', carrera: '', anio: '1' } : { ...common, rol: next, departamento: '', especialidad: '' }); setGeneral([]);
   }
   return <section className="grid gap-6">
-    <div><h1 className="text-2xl font-semibold">Crear cuenta</h1><p className="mt-2 text-muted">Registro de estudiantes y tutores académicos con correo institucional.</p></div>
+    <div><h1 className="text-2xl font-light text-ink">Crear cuenta</h1><p className="mt-2 text-muted">Registro de estudiantes y tutores académicos con correo institucional.</p></div>
     <form noValidate onSubmit={onSubmit} className="grid gap-4">
       <div ref={summary} tabIndex={-1}>{general.length > 0 && <div role="alert">{general.map((message, index) => <p key={index}>{message}</p>)}</div>}</div>
       <Controller name="rol" control={control} render={({ field }) => <Select {...field} label="Rol" value={field.value} onValueChange={changeRole} options={roleOptions} required disabled={isSubmitting} error={errorFor('rol')} />} />
