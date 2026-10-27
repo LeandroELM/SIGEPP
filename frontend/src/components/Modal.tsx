@@ -16,7 +16,7 @@ export function Modal({ open, onOpenChange, title, description, trigger, childre
   return <Dialog.Root open={open} onOpenChange={onOpenChange}>
     {trigger && <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>}
     <Dialog.Portal>
-      <Dialog.Overlay className="fixed inset-0 z-50 bg-text opacity-50" />
+      <Dialog.Overlay className="fixed inset-0 z-50 bg-ink opacity-60" />
       <Dialog.Content
         onKeyDown={(event) => {
           // A newer Toast layer can handle Escape without consuming it. Nested
@@ -26,8 +26,8 @@ export function Modal({ open, onOpenChange, title, description, trigger, childre
           event.stopPropagation();
           onOpenChange(false);
         }}
-        className="fixed left-1/2 top-1/2 z-50 grid max-h-[calc(100dvh_-_2rem)] w-[calc(100%_-_2rem)] max-w-[36rem] -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto rounded-card border border-border bg-surface p-6 text-text shadow-lg">
-        <Dialog.Title className="text-xl font-semibold">{title}</Dialog.Title>
+        className="fixed left-1/2 top-1/2 z-50 grid max-h-[calc(100dvh_-_2rem)] w-[calc(100%_-_2rem)] max-w-[36rem] -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto border border-ink bg-surface p-6 text-text shadow-[8px_8px_0_rgb(30_79_214_/_25%)]">
+        <Dialog.Title className="text-xl font-medium text-ink">{title}</Dialog.Title>
         <Dialog.Description className="text-muted">{description}</Dialog.Description>
         {children}
         <Dialog.Close asChild><Button variant="fantasma" aria-label="Cerrar diálogo"><X className="ui-icon" aria-hidden="true" />Cerrar</Button></Dialog.Close>

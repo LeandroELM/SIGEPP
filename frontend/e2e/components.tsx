@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import '@fontsource/inter/latin-400.css';
-import '@fontsource/inter/latin-600.css';
+import '@fontsource/geist-sans/latin-400.css';
+import '@fontsource/geist-sans/latin-600.css';
 import '../src/styles/tokens.css';
 import '../src/styles/global.css';
 import { Button } from '../src/components/Button';
