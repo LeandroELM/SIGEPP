@@ -7,6 +7,11 @@ export const ROLES = [
 
 export type Rol = (typeof ROLES)[number];
 
+export const ROL_ETIQUETAS: Record<Rol, string> = {
+  ESTUDIANTE: 'Estudiante', TUTOR_ACADEMICO: 'Tutor académico', TUTOR_EMPRESARIAL: 'Tutor empresarial',
+  ORGANIZACION: 'Organización', COORDINADOR: 'Coordinador', ADMIN: 'Administrador',
+};
+
 export const usuarioSchema = z.object({
   id: z.string(),
   nombres: z.string(),

@@ -28,6 +28,8 @@ export type SessionService = {
   refresh(expected: SessionIdentity): Promise<SessionAccess>;
   invalidate(expected: SessionIdentity): Promise<void>;
   logout(): Promise<void>;
+  /** Publishes the server's copy of the signed-in user after a profile edit. */
+  updateUsuario(usuario: Usuario): void;
 };
 export type SessionDependencies = {
   api: AuthApi;

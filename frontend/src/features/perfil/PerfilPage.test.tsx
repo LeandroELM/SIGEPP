@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, expect, it } from 'vitest';
@@ -21,10 +21,71 @@ it('perfil null y nombres largos muestra datos reales sin inventar cifras ni h1 
   expect(screen.getAllByText('No disponible').length).toBeGreaterThan(3);
   expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument(); expect(screen.queryByText('0%')).not.toBeInTheDocument(); expect(calls).toBe(1);
 });
-it('renderiza datos públicos de todos los perfiles presentes y números sin conversión inventada', async () => {
-  const usuario = makeUsuario('ADMIN', { estudiante: { id: 'e', carnet: '2026-1234A', carrera: 'Computación', anio: 4, porcentajeAvance: '73.50', avanceVerificado: false }, docente: { id: 'd', departamento: 'Sistemas', especialidad: null }, tutorEmpresarial: { id: 't', organizacionId: 'org-1', cargo: 'Supervisor' }, organizacion: { id: 'o', razonSocial: 'Empresa real', estadoVerificacion: 'PENDIENTE' } });
-  await mount(async (url) => String(url).endsWith('/auth/yo') ? json({ usuario }) : json(makeSesionResponse('ADMIN')));
-  for (const text of ['2026-1234A', 'Computación', '73.50%', 'Sistemas', 'Supervisor', 'org-1', 'Empresa real', 'PENDIENTE']) expect(await screen.findByText(text)).toBeInTheDocument();
+it('muestra solo el perfil del rol de la cuenta, con números sin conversión inventada', async () => {
+  const usuario = makeUsuario('ESTUDIANTE', { estudiante: { id: 'e', carnet: '2026-1234A', carrera: 'Computación', anio: 4, porcentajeAvance: '73.50', avanceVerificado: false }, docente: { id: 'd', departamento: 'Sistemas', especialidad: null } });
+  await mount(async (url) => String(url).endsWith('/auth/yo') ? json({ usuario }) : json(makeSesionResponse()));
+  for (const text of ['2026-1234A', 'Computación', '73.50%', 'Estudiante']) expect(await screen.findByText(text)).toBeInTheDocument();
+  expect(screen.queryByRole('heading', { name: 'Perfil de tutor académico' })).not.toBeInTheDocument();
+  expect(screen.queryByText('Sistemas')).not.toBeInTheDocument();
+});
+it('el administrador no ve perfiles de otros roles y puede editar sus datos personales', async () => {
+  const requests: { method: string; body: unknown }[] = [];
+  let usuario = makeUsuario('ADMIN', { nombres: 'Leandro', apellidos: 'Lacayo', telefono: '+505 8888 0000' });
+  const runtime = await mount(async (url, init) => {
+    if (!String(url).endsWith('/auth/yo')) return json(makeSesionResponse('ADMIN'));
+    if (init?.method === 'PATCH') {
+      const body = JSON.parse(String(init.body)); requests.push({ method: 'PATCH', body });
+      usuario = { ...usuario, ...body }; return json({ usuario });
+    }
+    return json({ usuario });
+  });
+  await screen.findByText('Leandro');
+  expect(screen.queryByRole('heading', { name: /Perfil de/ })).not.toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'Editar perfil' }));
+  const dialog = await screen.findByRole('dialog', { name: 'Editar perfil' });
+  const nombres = within(dialog).getByLabelText('Nombres'); await userEvent.clear(nombres); await userEvent.type(nombres, 'Leandro Enrique');
+  await userEvent.clear(within(dialog).getByLabelText('Teléfono (opcional)'));
+  await userEvent.click(within(dialog).getByRole('button', { name: 'Guardar cambios' }));
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  expect(requests).toEqual([{ method: 'PATCH', body: { nombres: 'Leandro Enrique', apellidos: 'Lacayo', telefono: null } }]);
+  expect(await screen.findByText('Leandro Enrique')).toBeInTheDocument();
+  // The session copy feeds the top bar, so it must reflect the saved name without a reload.
+  const snapshot = runtime.session.getSnapshot();
+  expect(snapshot.status === 'autenticada' && snapshot.usuario.nombres).toBe('Leandro Enrique');
+});
+it('el estudiante envía carrera y año; un error del servidor queda en el diálogo', async () => {
+  const usuario = makeUsuario('ESTUDIANTE', { estudiante: { id: 'e', carnet: '2026-1234A', carrera: 'Computación', anio: 4, porcentajeAvance: '80', avanceVerificado: true } });
+  let body: unknown;
+  await mount(async (url, init) => {
+    if (!String(url).endsWith('/auth/yo')) return json(makeSesionResponse());
+    if (init?.method === 'PATCH') { body = JSON.parse(String(init.body)); return json({ error: { codigo: 'VALIDACION', mensaje: 'Los datos enviados no son válidos', detalles: ['anio: Number must be less than or equal to 5'] } }, 400); }
+    return json({ usuario });
+  });
+  await userEvent.click(await screen.findByRole('button', { name: 'Editar perfil' }));
+  const dialog = await screen.findByRole('dialog');
+  const anio = within(dialog).getByLabelText('Año'); await userEvent.clear(anio); await userEvent.type(anio, '6');
+  await userEvent.click(within(dialog).getByRole('button', { name: 'Guardar cambios' }));
+  expect(await within(dialog).findByRole('alert')).toHaveTextContent('anio: Number must be less than or equal to 5');
+  expect(body).toEqual({ nombres: usuario.nombres, apellidos: usuario.apellidos, telefono: null, carrera: 'Computación', anio: 6 });
+});
+it('cambiar contraseña exige confirmación igual antes de llamar al API', async () => {
+  const calls: unknown[] = [];
+  await mount(async (url, init) => {
+    if (String(url).endsWith('/auth/yo/contrasena')) { calls.push(JSON.parse(String(init?.body))); return new Response(null, { status: 204 }); }
+    return String(url).endsWith('/auth/yo') ? json({ usuario: makeUsuario('ADMIN') }) : json(makeSesionResponse('ADMIN'));
+  });
+  await userEvent.click(await screen.findByRole('button', { name: 'Cambiar contraseña' }));
+  const dialog = await screen.findByRole('dialog', { name: 'Cambiar contraseña' });
+  await userEvent.type(within(dialog).getByLabelText('Contraseña actual'), 'Actual2026');
+  await userEvent.type(within(dialog).getByLabelText('Nueva contraseña'), 'Nueva2026');
+  await userEvent.type(within(dialog).getByLabelText('Confirma la nueva contraseña'), 'Otra2026');
+  await userEvent.click(within(dialog).getByRole('button', { name: 'Cambiar contraseña' }));
+  expect(await within(dialog).findByText('Las contraseñas no coinciden.')).toBeInTheDocument();
+  expect(calls).toHaveLength(0);
+  const confirmacion = within(dialog).getByLabelText('Confirma la nueva contraseña'); await userEvent.clear(confirmacion); await userEvent.type(confirmacion, 'Nueva2026');
+  await userEvent.click(within(dialog).getByRole('button', { name: 'Cambiar contraseña' }));
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  expect(calls).toEqual([{ contrasenaActual: 'Actual2026', contrasenaNueva: 'Nueva2026' }]);
 });
 it.each([false, true])('consulta fallida/malformada=%s requiere reintento manual', async (malformed) => {
   let calls = 0;

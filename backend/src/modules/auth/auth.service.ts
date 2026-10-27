@@ -6,7 +6,12 @@ import { env } from '../../config/env.js';
 import { registrarAuditoria } from '../../lib/auditoria.js';
 import { AppError, errores } from '../../lib/errores.js';
 import { prisma } from '../../lib/prisma.js';
-import type { LoginInput, RegistroInput } from './auth.schema.js';
+import type {
+  ActualizarPerfilInput,
+  CambiarContrasenaInput,
+  LoginInput,
+  RegistroInput,
+} from './auth.schema.js';
 
 /** RNF-08: intentos fallidos permitidos antes del bloqueo temporal. */
 export const MAX_INTENTOS_FALLIDOS = 5;
@@ -247,4 +252,108 @@ export const obtenerPerfil = async (usuarioId: string): Promise<UsuarioPublico> 
   });
   if (!usuario) throw errores.noEncontrado('Usuario');
   return usuario;
+};
+
+/** Campos del perfil de cada rol que la propia persona puede corregir. */
+const camposPorRol: Partial<Record<Rol, readonly (keyof ActualizarPerfilInput)[]>> = {
+  ESTUDIANTE: ['carrera', 'anio'],
+  TUTOR_ACADEMICO: ['departamento', 'especialidad'],
+  TUTOR_EMPRESARIAL: ['cargo'],
+};
+const camposDeRol = ['carrera', 'anio', 'departamento', 'especialidad', 'cargo'] as const;
+
+/** Actualiza los datos personales y los del perfil del rol de la persona autenticada. */
+export const actualizarPerfil = async (
+  usuarioId: string,
+  datos: ActualizarPerfilInput,
+): Promise<UsuarioPublico> => {
+  const actual = await obtenerPerfil(usuarioId);
+  const permitidos = camposPorRol[actual.rol] ?? [];
+  const ajenos = camposDeRol.filter(
+    (campo) => datos[campo] !== undefined && !permitidos.includes(campo),
+  );
+  if (ajenos.length > 0) {
+    throw errores.validacion(ajenos.map((campo) => `${campo}: no aplica a tu rol`));
+  }
+
+  const { nombres, apellidos, telefono, carrera, anio, departamento, especialidad, cargo } = datos;
+  const data: Prisma.UsuarioUpdateInput = { nombres, apellidos, telefono };
+  if (actual.estudiante && (carrera !== undefined || anio !== undefined)) {
+    data.estudiante = { update: { carrera, anio } };
+  }
+  if (actual.docente && (departamento !== undefined || especialidad !== undefined)) {
+    data.docente = { update: { departamento, especialidad } };
+  }
+  if (actual.tutorEmpresarial && cargo !== undefined) {
+    data.tutorEmpresarial = { update: { cargo } };
+  }
+
+  const anteriores: Record<string, string | number | null | undefined> = {
+    nombres: actual.nombres,
+    apellidos: actual.apellidos,
+    telefono: actual.telefono,
+    carrera: actual.estudiante?.carrera,
+    anio: actual.estudiante?.anio,
+    departamento: actual.docente?.departamento,
+    especialidad: actual.docente?.especialidad,
+    cargo: actual.tutorEmpresarial?.cargo,
+  };
+  return prisma.$transaction(async (tx) => {
+    const usuario = await tx.usuario.update({
+      where: { id: usuarioId },
+      data,
+      select: usuarioPublicoSelect,
+    });
+    await registrarAuditoria(
+      {
+        usuarioId,
+        entidad: 'Usuario',
+        entidadId: usuarioId,
+        accion: 'ACTUALIZAR_PERFIL',
+        // Solo los campos enviados, para que la bitácora muestre qué cambió.
+        valoresAnteriores: Object.fromEntries(
+          Object.keys(datos).map((campo) => [campo, anteriores[campo] ?? null]),
+        ),
+        valoresNuevos: datos,
+      },
+      tx,
+    );
+    return usuario;
+  });
+};
+
+/**
+ * Cambia la contraseña tras verificar la actual. Cierra las demás sesiones abiertas y
+ * conserva la del dispositivo desde el que se hizo el cambio.
+ */
+export const cambiarContrasena = async (
+  usuarioId: string,
+  datos: CambiarContrasenaInput,
+  refreshTokenActual: string | undefined,
+) => {
+  const usuario = await prisma.usuario.findUnique({
+    where: { id: usuarioId },
+    select: { hashContrasena: true },
+  });
+  if (!usuario) throw errores.noEncontrado('Usuario');
+  if (!(await bcrypt.compare(datos.contrasenaActual, usuario.hashContrasena))) {
+    throw errores.validacion(['contrasenaActual: La contraseña actual no es correcta']);
+  }
+
+  const hashContrasena = await bcrypt.hash(datos.contrasenaNueva, env.BCRYPT_COST);
+  await prisma.$transaction(async (tx) => {
+    await tx.usuario.update({ where: { id: usuarioId }, data: { hashContrasena } });
+    await tx.refreshToken.updateMany({
+      where: {
+        usuarioId,
+        revocadoEn: null,
+        ...(refreshTokenActual && { tokenHash: { not: hashToken(refreshTokenActual) } }),
+      },
+      data: { revocadoEn: new Date() },
+    });
+    await registrarAuditoria(
+      { usuarioId, entidad: 'Usuario', entidadId: usuarioId, accion: 'CAMBIAR_CONTRASENA' },
+      tx,
+    );
+  });
 };
