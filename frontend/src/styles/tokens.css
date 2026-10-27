@@ -1,16 +1,32 @@
 :root {
-  --color-primary: #1F3864;
-  --color-secondary: #2E5496;
-  --color-info: #2E5496;
-  --color-success: #00B050;
-  --color-warning: #ED7D31;
-  --color-error: #C00000;
-  --color-text: #202020;
-  --color-text-secondary: #595959;
-  --color-border: #D9D9D9;
-  --color-border-interactive: #767676;
-  --color-background: #F7F7F9;
+  /* Paleta "plano de ingeniería": navy de tinta, cobalto de acción y celeste de luz. */
+  --color-ink: #0A1F44;
+  --color-primary: #1E4FD6;
+  --color-primary-strong: #163DAE;
+  --color-secondary: #0E3A9C;
+  --color-sky: #38BDF8;
+  --color-info: #1A5FC4;
+  --color-success: #3DD68C;
+  --color-warning: #F5A524;
+  --color-error: #C81E3A;
+  --color-text: #0B1B3A;
+  --color-text-secondary: #4A5B7A;
+  --color-border: #D3DEF0;
+  --color-border-interactive: #6B7FA3;
+  --color-background: #F3F7FD;
   --color-surface: #FFFFFF;
+  --color-tint: #E8F0FD;
+  --color-grid: rgb(30 79 214 / 9%);
+  --color-grid-on-dark: rgb(255 255 255 / 8%);
+
+  --gradient-brand: linear-gradient(135deg, #0A1F44 0%, #12358F 45%, #1E4FD6 75%, #38BDF8 130%);
+  --gradient-panel: linear-gradient(180deg, #0A1F44 0%, #0F2C6E 60%, #163DAE 100%);
+  --gradient-action: linear-gradient(180deg, #2A5CE6 0%, #1A45C2 100%);
+  --gradient-rule: linear-gradient(90deg, #0E3A9C 0%, #1E4FD6 50%, #38BDF8 100%);
+  --gradient-text: linear-gradient(90deg, #1E4FD6 0%, #38BDF8 100%);
+
+  --font-sans: 'Geist Sans', Arial, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
 
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
@@ -18,6 +34,7 @@
   --font-size-lg: 1.25rem;
   --font-size-xl: 1.5rem;
   --font-size-2xl: 2rem;
+  --font-size-display: clamp(2.25rem, 1.6rem + 2.6vw, 3.5rem);
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -27,6 +44,10 @@
   --space-8: 2rem;
   --space-12: 3rem;
 
-  --radius-control: 6px;
-  --radius-card: 8px;
+  /* Interfaz cuadrada: sin esquinas redondeadas en controles ni tarjetas. */
+  --radius-control: 0;
+  --radius-card: 0;
+
+  --grid-size: 2rem;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
