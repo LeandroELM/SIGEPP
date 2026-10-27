@@ -158,6 +158,11 @@ export function createSessionService({ api, logoutStore, onInvalidate }: Session
         }
       });
     },
+    updateUsuario(usuario) {
+      // Ignores a late response that belongs to another account or an ended session.
+      if (snapshot.status !== 'autenticada' || snapshot.usuario.id !== usuario.id) return;
+      publish({ status: 'autenticada', usuario, error: snapshot.error });
+    },
     logout() {
       logoutRevision += 1;
       const expectedRevision = logoutRevision;

@@ -1,6 +1,12 @@
 import { json, registro, respuestasError, seguridad } from '../../docs/registro.js';
 import { z } from '../../lib/zod.js';
-import { loginSchema, registroSchema, usuarioPublicoSchema } from './auth.schema.js';
+import {
+  actualizarPerfilSchema,
+  cambiarContrasenaSchema,
+  loginSchema,
+  registroSchema,
+  usuarioPublicoSchema,
+} from './auth.schema.js';
 
 const tag = 'Autenticación';
 
@@ -76,5 +82,35 @@ registro.registerPath({
   responses: {
     200: json(z.object({ usuario: usuarioPublicoSchema }), 'Usuario de la sesión'),
     ...respuestasError(401),
+  },
+});
+
+registro.registerPath({
+  method: 'patch',
+  path: '/auth/yo',
+  tags: [tag],
+  summary: 'Actualizar mi perfil',
+  description:
+    'Todos los roles corrigen nombres, apellidos y teléfono (`null` lo borra). El estudiante edita además carrera y año; el tutor académico, departamento y especialidad; el tutor empresarial, su cargo. El correo, el carnet, el rol y el avance académico no se editan.',
+  security: seguridad,
+  request: { body: { content: { 'application/json': { schema: actualizarPerfilSchema } } } },
+  responses: {
+    200: json(z.object({ usuario: usuarioPublicoSchema }), 'Perfil actualizado'),
+    ...respuestasError(400, 401),
+  },
+});
+
+registro.registerPath({
+  method: 'put',
+  path: '/auth/yo/contrasena',
+  tags: [tag],
+  summary: 'Cambiar mi contraseña',
+  description:
+    'Verifica la contraseña actual. Cierra las demás sesiones abiertas y conserva la del dispositivo actual.',
+  security: seguridad,
+  request: { body: { content: { 'application/json': { schema: cambiarContrasenaSchema } } } },
+  responses: {
+    204: { description: 'Contraseña cambiada' },
+    ...respuestasError(400, 401, 429),
   },
 });
