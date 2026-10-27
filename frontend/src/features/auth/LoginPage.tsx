@@ -51,7 +51,7 @@ export default function LoginPage() {
     submitting.current = true; void handleSubmit(submit)(event).finally(() => { submitting.current = false; });
   }
   return <section className="grid gap-6">
-    <div><h1 className="text-2xl font-semibold">Iniciar sesión</h1><p className="mt-2 text-muted">Accede a SIGEPP con tu cuenta.</p></div>
+    <div><h1 className="text-2xl font-light text-ink">Iniciar sesión</h1><p className="mt-2 text-muted">Accede a SIGEPP con tu cuenta.</p></div>
     {snapshot.logoutPending && <aside className="grid gap-3 rounded-card border border-warning p-4" aria-label="Cierre de sesión pendiente">
       <p>El cierre de sesión remoto está pendiente. Reintenta para completar el cierre.</p>
       {!snapshot.logoutPersistenceAvailable && <p>No se pudo persistir el cierre pendiente en el almacenamiento de esta pestaña.</p>}
