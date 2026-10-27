@@ -16,8 +16,8 @@ export const crearApp = () => {
   const app = express();
 
   app.disable('x-powered-by');
-  // Detrás del proxy de la plataforma de despliegue, para obtener la IP real del cliente.
-  if (esProduccion) app.set('trust proxy', 1);
+  // Detrás de los proxies de la plataforma de despliegue, para obtener la IP real del cliente.
+  if (esProduccion) app.set('trust proxy', env.TRUST_PROXY);
 
   app.use(
     helmet({
